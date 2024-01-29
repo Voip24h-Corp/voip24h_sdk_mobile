@@ -64,29 +64,29 @@ Future<void> setupFlutterNotifications() async {
   isFlutterLocalNotificationsInitialized = true;
 }
 
-// @pragma('vm:entry-point')
-// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-//   if(Platform.isAndroid) {
-//     print("Handling a background message: ${message.data}");
-//     await Firebase.initializeApp().whenComplete(() => {
-//       localNotificationService.initialNotification().then((value) => {
-//         testCallKit()
-//       })
-//     });
-//     // await setupFlutterNotifications();
-//     // showFlutterNotification(message);
-//     // If you're going to use other Firebase services in the background, such as Firestore,
-//     // make sure you call `initializeApp` before using other Firebase services.
-//   }
-// }
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  if(Platform.isAndroid) {
+    print("Handling a background message: ${message.data}");
+    await Firebase.initializeApp().whenComplete(() => {
+      localNotificationService.initialNotification().then((value) => {
+        testCallKit()
+      })
+    });
+    // await setupFlutterNotifications();
+    // showFlutterNotification(message);
+    // If you're going to use other Firebase services in the background, such as Firestore,
+    // make sure you call `initializeApp` before using other Firebase services.
+  }
+}
 // endregion
 
 Future<void> main() async {
   // region Initial Firebase messaging and Initial Firebase message Background
   WidgetsFlutterBinding.ensureInitialized();
   if(Platform.isAndroid) {
-    // await Firebase.initializeApp();
-    // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    await Firebase.initializeApp();
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
   // endregion
   localNotificationService.initialNotification();
@@ -188,24 +188,24 @@ class _MyAppState extends State<MyApp> {
     testCallKit();
 
     if(Platform.isAndroid) {
-      // requestPermissionNotification();
+      requestPermissionNotification();
     } else if (Platform.isIOS) {
       configureCallKeep();
     }
   }
 
   // region Request Permission Notification and Initial Firebase message Foreground
-  // Future<void> requestPermissionNotification() async {
-  //   NotificationSettings settings = await messaging.requestPermission(
-  //     alert: true,
-  //     announcement: false,
-  //     badge: true,
-  //     carPlay: false,
-  //     criticalAlert: false,
-  //     provisional: false,
-  //     sound: true,
-  //   );
-  // }
+  Future<void> requestPermissionNotification() async {
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+  }
 
   Future<void> requestPermissionMicroPhone() async {
     await Permission.microphone.request();
@@ -366,28 +366,28 @@ class _MyAppState extends State<MyApp> {
   }
 
   void registerPushForAndroid() async {
-    // String? token = await messaging.getToken();
-    // if(token != null) {
-    //   PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    //   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    //   AndroidDeviceInfo androidDeviceInfo = await deviceInfo.androidInfo;
-    //   print(packageInfo.packageName);
-    //   Voip24hSdkMobile.pushNotificationModule.registerPushNotification(
-    //       tokenGraph: tokenGraph,
-    //       token: token,
-    //       sipConfiguration: sipConfiguration,
-    //       isAndroid: true,
-    //       appId: packageInfo.packageName,
-    //       isProduction: false,
-    //       deviceMac: androidDeviceInfo.androidId
-    //   ).then((value) => {
-    //     print(value)
-    //   }, onError: (error) => {
-    //     print(error)
-    //   });
-    // } else {
-    //   print("Token push android not found");
-    // }
+    String? token = await messaging.getToken();
+    if(token != null) {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      AndroidDeviceInfo androidDeviceInfo = await deviceInfo.androidInfo;
+      print(packageInfo.packageName);
+      Voip24hSdkMobile.pushNotificationModule.registerPushNotification(
+          tokenGraph: tokenGraph,
+          token: token,
+          sipConfiguration: sipConfiguration,
+          isAndroid: true,
+          appId: packageInfo.packageName,
+          isProduction: false,
+          deviceMac: androidDeviceInfo.androidId
+      ).then((value) => {
+        print(value)
+      }, onError: (error) => {
+        print(error)
+      });
+    } else {
+      print("Token push android not found");
+    }
   }
 
   void registerPushForIOS() async {
