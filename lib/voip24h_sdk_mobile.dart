@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:voip24h_sdk_mobile/callkit/call_module.dart';
 import 'package:voip24h_sdk_mobile/graph/graph_module.dart';
+import 'package:voip24h_sdk_mobile/push_notification_module.dart';
 
 class Voip24hSdkMobile {
 
@@ -14,4 +15,5 @@ class Voip24hSdkMobile {
 
   static GraphModule graphModule = GraphModule.instance;
   static CallModule callModule = CallModule.instance;
+  static PushNotificationModule pushNotificationModule = PushNotificationModule.instance;
 }

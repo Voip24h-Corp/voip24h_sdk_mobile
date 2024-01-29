@@ -4,6 +4,7 @@ import 'package:voip24h_sdk_mobile/callkit/utils/sip_event.dart';
 import 'package:voip24h_sdk_mobile/callkit/model/sip_configuration.dart';
 
 class CallModule {
+
   CallModule._privateConstructor();
 
   static final CallModule _instance = CallModule._privateConstructor();
@@ -22,7 +23,9 @@ class CallModule {
   StreamController<dynamic> get eventStreamController => _eventStreamController;
 
   Future<void> initSipModule(SipConfiguration sipConfiguration) async {
-    broadcastStream.listen(_listener);
+    if(!_eventStreamController.hasListener) {
+      broadcastStream.listen(_listener);
+    }
     await _methodChannel.invokeMethod('initSipModule', {"sipConfiguration": sipConfiguration.toJson()});
   }
 
@@ -123,4 +126,8 @@ class CallModule {
   Future<bool> isSpeakerEnabled() async {
     return await _methodChannel.invokeMethod('isSpeakerEnabled');
   }
+
+  // Future<void> registerPush() async {
+  //   return await _methodChannel.invokeMethod('registerPush');
+  // }
 }

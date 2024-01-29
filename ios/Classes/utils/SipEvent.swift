@@ -26,6 +26,9 @@ enum SipEvent : String {
     case Error = "Error"
     /// Status call release
     case Released = "Released"
+    case PushReceive = "PushReceive"
+    ///  Token receivce
+    case PushToken = "PushToken"
 }
 
 
@@ -38,3 +41,5 @@ let EventMissed = SipEvent.Missed.rawValue
 let EventHangup = SipEvent.Hangup.rawValue
 let EventError = SipEvent.Error.rawValue
 let EventReleased = SipEvent.Released.rawValue
+let EventPushReceive = SipEvent.PushReceive.rawValue
+let EventPushToken = SipEvent.PushToken.rawValue

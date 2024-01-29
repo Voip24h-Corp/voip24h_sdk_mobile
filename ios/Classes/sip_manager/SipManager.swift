@@ -454,9 +454,9 @@ class SipManager {
         result(mCore.micEnabled)
     }
     
-    func refreshSipAccount(result: FlutterResult) {
+    func refreshSipAccount(result: FlutterResult? = nil) {
         mCore.refreshRegisters()
-        result(true)
+        result?(true)
     }
     
     func unregisterSipAccount(result: FlutterResult) {

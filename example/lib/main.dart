@@ -1,15 +1,155 @@
+import 'dart:io';
+// import 'package:firebase_core/firebase_core.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:callkeep/callkeep.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:uuid/uuid.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:device_info/device_info.dart';
 import 'package:voip24h_sdk_mobile/voip24h_sdk_mobile.dart';
 import 'package:voip24h_sdk_mobile/callkit/utils/sip_event.dart';
 import 'package:voip24h_sdk_mobile/callkit/utils/transport_type.dart';
 import 'package:voip24h_sdk_mobile/graph/extensions/extensions.dart';
 import 'package:voip24h_sdk_mobile/callkit/model/sip_configuration.dart';
+import 'package:voip24h_sdk_mobile_example/LocalNotificationService.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-void main() {
+
+// region Setup Firebase messaging
+// FirebaseMessaging messaging = FirebaseMessaging.instance;
+late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+bool isFlutterLocalNotificationsInitialized = false;
+late AndroidNotificationChannel channel;
+var localNotificationService = LocalNotificationService();
+StreamSubscription<dynamic>? observeEvent;
+// Key request API Graph
+const API_KEY = "c3axxxxxxx";
+const API_SECERT = "8a2xxxxxx";
+var tokenGraph = "";
+var tokenPushIOS = "";
+var callId = "";
+var sipConfiguration = SipConfigurationBuilder(extension: "extension", domain: "ip", password: "pass")
+    .setKeepAlive(true)
+    .setPort(5060)
+    .setTransport(TransportType.Udp)
+    .build();
+final FlutterCallkeep callKeep = FlutterCallkeep();
+
+Future<void> setupFlutterNotifications() async {
+  if (isFlutterLocalNotificationsInitialized) {
+    return;
+  }
+  channel = const AndroidNotificationChannel(
+    'incoming_call', // id
+    'High Importance Notifications', // title
+    description:
+    'This channel is used for important notifications.', // description
+    importance: Importance.max,
+  );
+
+  flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+  /// Create an Android Notification Channel.
+  ///
+  /// We use this channel in the `AndroidManifest.xml` file to override the
+  /// default FCM channel to enable heads up notifications.
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+      AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
+  isFlutterLocalNotificationsInitialized = true;
+}
+
+// @pragma('vm:entry-point')
+// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+//   if(Platform.isAndroid) {
+//     print("Handling a background message: ${message.data}");
+//     await Firebase.initializeApp().whenComplete(() => {
+//       localNotificationService.initialNotification().then((value) => {
+//         testCallKit()
+//       })
+//     });
+//     // await setupFlutterNotifications();
+//     // showFlutterNotification(message);
+//     // If you're going to use other Firebase services in the background, such as Firestore,
+//     // make sure you call `initializeApp` before using other Firebase services.
+//   }
+// }
+// endregion
+
+Future<void> main() async {
+  // region Initial Firebase messaging and Initial Firebase message Background
+  WidgetsFlutterBinding.ensureInitialized();
+  if(Platform.isAndroid) {
+    // await Firebase.initializeApp();
+    // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  }
+  // endregion
+  localNotificationService.initialNotification();
   runApp(const MyApp());
+}
+
+Future<void> testCallKit() async {
+  Voip24hSdkMobile.callModule.initSipModule(sipConfiguration);
+  if(observeEvent != null) {
+    await observeEvent!.cancel();
+  }
+  observeEvent = Voip24hSdkMobile.callModule.eventStreamController.stream.listen((event) {
+    switch (event['event']) {
+      case SipEvent.AccountRegistrationStateChanged: {
+        var body = event['body'];
+        print(body);
+      }
+      break;
+      case SipEvent.Ring: {
+        var body = event['body'];
+        print("Ring");
+        if(body['callType'] == "inbound") {
+          if(Platform.isIOS) {
+            if(callId.isNotEmpty) {
+              callKeep.updateDisplay(callId, callerName: "updated", handle: "generic");
+            } else {
+              const uuid = Uuid();
+              String newUuid = uuid.v4();
+              callId = newUuid;
+              callKeep.displayIncomingCall(newUuid, "generic", callerName: body['phoneNumber']);
+            }
+          } else if(Platform.isAndroid) {
+            localNotificationService.showNotification(body: "Incoming call ${body['phoneNumber']}");
+          }
+        }
+      }
+      break;
+      case SipEvent.Up: {
+        var body = event['body'];
+      }
+      break;
+      case SipEvent.Hangup: {
+        var body = event['body'];
+        callKeep.endAllCalls();
+        callId = "";
+      }
+      break;
+      case SipEvent.Paused: {
+      }
+      break;
+      case SipEvent.Resuming: {
+      }
+      break;
+      case SipEvent.Missed: {
+        var body = event['body'];
+      }
+      break;
+      case SipEvent.Error: {
+        var body = event['body'];
+      }
+      break;
+    }
+  });
 }
 
 class MyApp extends StatefulWidget {
@@ -19,22 +159,13 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-const API_KEY = "524aexxxxx";
-const API_SECERT = "75c65xxxxx";
-
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
 
   Future<void> testGraph() async {
-    // FlutterVoip24hSdk.graphModule.getAccessToken(apiKey: API_KEY, apiSecert: API_SECERT).then((value) => {
-    //   print(value.token)
-    // }, onError: (error) => {
-    //   print(error)
-    // });
     var oauth = await Voip24hSdkMobile.graphModule.getAccessToken(apiKey: API_KEY, apiSecert: API_SECERT);
     var body = {"offset": "0"};
-    Voip24hSdkMobile.graphModule.sendRequest(token: oauth.token, endpoint: "call/find", body: body).then(
-            (value) => {
+    Voip24hSdkMobile.graphModule.sendRequest(token: oauth.token, endpoint: "call/find", body: body).then((value) => {
           print(value.getDataList()),
           print(value.statusCode()),
           print(value.message()),
@@ -49,73 +180,34 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  void testCallKit() {
-    var sipConfiguration = SipConfigurationBuilder(extension: "extension", domain: "domain", password: "password")
-        .setKeepAlive(true)
-        .setPort(5060)
-        .setTransport(TransportType.Udp)
-        .build();
-    Voip24hSdkMobile.callModule.initSipModule(sipConfiguration);
-    Voip24hSdkMobile.callModule.eventStreamController.stream.listen((event) {
-      switch (event['event']) {
-        case SipEvent.AccountRegistrationStateChanged: {
-          var body = event['body'];
-          print("AccountRegistrationStateChanged");
-          print(body);
-        }
-        break;
-        case SipEvent.Ring: {
-          var body = event['body'];
-          print("Ring");
-          print(body);
-        }
-        break;
-        case SipEvent.Up: {
-          var body = event['body'];
-          print("Up");
-          print(body);
-        }
-        break;
-        case SipEvent.Hangup: {
-          var body = event['body'];
-          print("Hangup");
-          print(body);
-        }
-        break;
-        case SipEvent.Paused: {
-          print("Paused");
-        }
-        break;
-        case SipEvent.Resuming: {
-          print("Resuming");
-        }
-        break;
-        case SipEvent.Missed: {
-          var body = event['body'];
-          print("Missed");
-          print(body);
-        }
-        break;
-        case SipEvent.Error: {
-          var body = event['body'];
-          print("Error");
-          print(body);
-        }
-        break;
-      }
-    });
-  }
-
   @override
   void initState() {
     super.initState();
-    requestPermission();
+    requestPermissionMicroPhone();
     initPlatformState();
-    testGraph();
     testCallKit();
+
+    if(Platform.isAndroid) {
+      // requestPermissionNotification();
+    } else if (Platform.isIOS) {
+      configureCallKeep();
+    }
   }
 
-  Future<void> requestPermission() async {
+  // region Request Permission Notification and Initial Firebase message Foreground
+  // Future<void> requestPermissionNotification() async {
+  //   NotificationSettings settings = await messaging.requestPermission(
+  //     alert: true,
+  //     announcement: false,
+  //     badge: true,
+  //     carPlay: false,
+  //     criticalAlert: false,
+  //     provisional: false,
+  //     sound: true,
+  //   );
+  // }
+
+  Future<void> requestPermissionMicroPhone() async {
     await Permission.microphone.request();
   }
 
@@ -138,6 +230,12 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       _platformVersion = platformVersion;
     });
+  }
+
+  Future<void> getTokenGraph() async {
+    var oauth = await Voip24hSdkMobile.graphModule.getAccessToken(apiKey: API_KEY, apiSecert: API_SECERT);
+    tokenGraph = oauth.token;
+    print(tokenGraph);
   }
 
   void call(String phoneNumber) {
@@ -224,7 +322,6 @@ class _MyAppState extends State<MyApp> {
     Voip24hSdkMobile.callModule.getSipRegistrationState().then((value) => {
       print(value)
     }, onError: (error) {
-      print(error);
     });
   }
 
@@ -268,6 +365,88 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  void registerPushForAndroid() async {
+    // String? token = await messaging.getToken();
+    // if(token != null) {
+    //   PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    //   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    //   AndroidDeviceInfo androidDeviceInfo = await deviceInfo.androidInfo;
+    //   print(packageInfo.packageName);
+    //   Voip24hSdkMobile.pushNotificationModule.registerPushNotification(
+    //       tokenGraph: tokenGraph,
+    //       token: token,
+    //       sipConfiguration: sipConfiguration,
+    //       isAndroid: true,
+    //       appId: packageInfo.packageName,
+    //       isProduction: false,
+    //       deviceMac: androidDeviceInfo.androidId
+    //   ).then((value) => {
+    //     print(value)
+    //   }, onError: (error) => {
+    //     print(error)
+    //   });
+    // } else {
+    //   print("Token push android not found");
+    // }
+  }
+
+  void registerPushForIOS() async {
+    if(tokenPushIOS.isNotEmpty) {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      IosDeviceInfo iosDeviceInfo = await deviceInfo.iosInfo;
+      Voip24hSdkMobile.pushNotificationModule.registerPushNotification(
+          tokenGraph: tokenGraph,
+          token: tokenPushIOS,
+          sipConfiguration: sipConfiguration,
+          isIOS: true,
+          appId: packageInfo.packageName,
+          isProduction: false,
+          deviceMac: iosDeviceInfo.identifierForVendor
+      ).then((value) => {
+        print(value)
+      }, onError: (error) => {
+        print(error)
+      });
+    } else {
+      print("Token push ios not found");
+    }
+  }
+
+  Future<void> configureCallKeep() async {
+    callKeep.on<CallKeepPushKitToken>((value) => {
+      tokenPushIOS = value.token ?? ""
+    });
+    callKeep.on<CallKeepReceivedPushNotification>((value) => {
+      callId = value.callId ?? "",
+      testCallKit()
+    });
+    callKeep.on<CallKeepPerformAnswerCallAction>((value) => {
+      answer()
+    });
+    callKeep.on<CallKeepPerformEndCallAction>((value) => {
+      reject()
+    });
+    callKeep.setup(context, <String, dynamic>{
+      'ios': {
+        'appName': 'Example',
+      }
+    });
+  }
+
+  void unregisterPushNotification() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    Voip24hSdkMobile.pushNotificationModule.unregisterPushNotification(
+        sipConfiguration: sipConfiguration,
+        isAndroid: true,
+        appId: packageInfo.packageName
+    ).then((value) => {
+      print(value)
+    }, onError: (error) => {
+      print(error)
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -280,6 +459,30 @@ class _MyAppState extends State<MyApp> {
             child: Column(
               children: [
                 Padding(padding: const EdgeInsets.all(12.0), child: Text('Running on: $_platformVersion\n')),
+                OutlinedButton(
+                  child: const Text('Get token Graph'),
+                  onPressed: () {
+                    getTokenGraph();
+                  },
+                ),
+                OutlinedButton(
+                  child: const Text('Register push notification for Android'),
+                  onPressed: () {
+                    registerPushForAndroid();
+                  },
+                ),
+                OutlinedButton(
+                  child: const Text('Register push notification for IOS'),
+                  onPressed: () {
+                    registerPushForIOS();
+                  },
+                ),
+                OutlinedButton(
+                  child: const Text('Test Graph'),
+                  onPressed: () {
+                    testGraph();
+                  },
+                ),
                 OutlinedButton(
                   child: const Text('Call'),
                   onPressed: () {

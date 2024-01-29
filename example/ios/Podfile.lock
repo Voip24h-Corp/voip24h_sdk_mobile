@@ -1,5 +1,11 @@
 PODS:
+  - callkeep (0.0.1):
+    - Flutter
+  - device_info (0.0.1):
+    - Flutter
   - Flutter (1.0.0)
+  - flutter_local_notifications (0.0.1):
+    - Flutter
   - linphone-sdk-novideo (5.1.36):
     - linphone-sdk-novideo/all-frameworks (= 5.1.36)
     - linphone-sdk-novideo/app-extension (= 5.1.36)
@@ -15,15 +21,21 @@ PODS:
   - linphone-sdk-novideo/swift (5.1.36):
     - linphone-sdk-novideo/app-extension-swift
     - linphone-sdk-novideo/basic-frameworks
-  - permission_handler_apple (9.0.4):
+  - package_info_plus (0.4.5):
+    - Flutter
+  - permission_handler_apple (9.1.1):
     - Flutter
   - voip24h_sdk_mobile (0.0.1):
     - Flutter
     - linphone-sdk-novideo
 
 DEPENDENCIES:
+  - callkeep (from `.symlinks/plugins/callkeep/ios`)
+  - device_info (from `.symlinks/plugins/device_info/ios`)
   - Flutter (from `Flutter`)
+  - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - linphone-sdk-novideo (= 5.1.36)
+  - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - voip24h_sdk_mobile (from `.symlinks/plugins/voip24h_sdk_mobile/ios`)
 
@@ -32,19 +44,31 @@ SPEC REPOS:
     - linphone-sdk-novideo
 
 EXTERNAL SOURCES:
+  callkeep:
+    :path: ".symlinks/plugins/callkeep/ios"
+  device_info:
+    :path: ".symlinks/plugins/device_info/ios"
   Flutter:
     :path: Flutter
+  flutter_local_notifications:
+    :path: ".symlinks/plugins/flutter_local_notifications/ios"
+  package_info_plus:
+    :path: ".symlinks/plugins/package_info_plus/ios"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
   voip24h_sdk_mobile:
     :path: ".symlinks/plugins/voip24h_sdk_mobile/ios"
 
 SPEC CHECKSUMS:
-  Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
+  callkeep: 6b21abbd46786a36e482190816db99b391ada1e3
+  device_info: d7d233b645a32c40dfdc212de5cf646ca482f175
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
   linphone-sdk-novideo: 3ec4521c6c9d52de2f8e7a94d2a7f39769154ceb
-  permission_handler_apple: 44366e37eaf29454a1e7b1b7d736c2cceaeb17ce
+  package_info_plus: 115f4ad11e0698c8c1c5d8a689390df880f47e85
+  permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
   voip24h_sdk_mobile: 0ddd687b86366be25c0c4b261cf9da7e4d9e10de
 
-PODFILE CHECKSUM: c37d28e3d55607805d1bc8ee6080399187454839
+PODFILE CHECKSUM: c3844efdbbe3b2623de90f105b32252435202762
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.11.3
