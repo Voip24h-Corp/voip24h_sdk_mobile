@@ -9,6 +9,7 @@
 - [Cài đặt](#cài-đặt)
 - [Khai báo module](#khai-báo-module)
 - [CallKit](#callkit)
+- [Push Notification](#push-notification)
 - [Graph](#graph)
 
 ## Tính năng
@@ -41,7 +42,7 @@
 ## Cài đặt
 Sử dụng terminal:
 ```bash
-$ flutter pub add voip24h_sdk_mobile
+flutter pub add voip24h_sdk_mobile
 ```
 Linking module:
 - IOS:
@@ -65,8 +66,8 @@ Linking module:
         ```
     - Trong folder `ios` mở terminal, nhập dòng lệnh:
         ```bash
-        $ rm -rf Pods/
-        $ pod install
+        rm -rf Pods/
+        pod install
         ```
 
 ## Khai báo module
@@ -150,6 +151,48 @@ import 'package:voip24h_sdk_mobile/callkit/model/sip_configuration.dart';
 | SipEvent.Resuming | None
 | SipEvent.Missed | body = { <br>&emsp; phoneNumber: `String`, <br>&emsp; totalMissed: `int` <br> } | phone: số điện thoại người gọi <br> totalMissed: tổng cuộc gọi nhỡ
 | SipEvent.Error | body = { <br>&emsp; message: `String` <br> } | message: trạng thái lỗi
+
+## Push Notification
+- IOS: Chúng tôi sử dụng Apple Push Notification service (APNs) cho thông báo đẩy cuộc gọi đến khi app ở trạng thái background
+  + Step 1: Tạo APNs Auth Key
+    - Truy cập [Apple Developer](https://developer.apple.com/account/resources/certificates/list) để tạo Certificates \
+      ![9](/assets/9.png)
+    - Chọn chứng nhận VoIP Services Certificate
+      ![7](/assets/7.png)
+    - Chọn ID ứng dụng của bạn. Mỗi ứng dụng bạn muốn sử dụng với dịch vụ VoIP đều yêu cầu chứng chỉ dịch vụ VoIP riêng. Chứng chỉ dịch vụ VoIP dành riêng cho ID ứng dụng cho phép máy chủ thông báo (Voip24h) kết nối với dịch vụ VoIP để gửi thông báo đẩy về ứng dụng của bạn. \
+      ![8](/assets/8.png)
+    - Download file chứng chỉ và mở bằng Keychain Access \
+      ![11](/assets/11.png)
+    - Export chứng chỉ sang định dạng .p12 \
+      ![12](/assets/12.png)
+    - Convert file chứng chỉ .p12 sang định dạng .pem và submit cho [Voip24h](https://voip24h.vn/) cấu hình
+      ```
+      openssl pkcs12 -in path_your_certificate.p12 -out path_your_certificate.pem -nodes
+      ```
++ Step 2: Cấu hình project app của bạn để nhận thông báo đẩy cuộc gọi đến -> Từ IOS 10 trở lên, sử dụng CallKit + PushKit
+    > - [Callkit](https://developer.apple.com/documentation/callkit/) cho phép hiển thị giao diện cuộc gọi hệ thống cho các dịch vụ VoIP trong ứng dụng của bạn và điều phối dịch vụ gọi điện của bạn với các ứng dụng và hệ thống khác.
+    > - [PushKit](https://developer.apple.com/documentation/pushkit) hỗ trợ các thông báo chuyên biệt để nhận các cuộc gọi Thoại qua IP (VoIP) đến.
+    
+    - Để sử dụng CallKit Framework + PushKit FrameWork, chúng tôi khuyến khích sử dụng thư viện [callkeep](https://github.com/Voip24h-Corp/callkeep), trong pubspec.yaml:
+    ```
+    dependencies:
+        ....
+        callkeep:
+        git:
+          url: https://github.com/Voip24h-Corp/callkeep
+          ref: master
+    ```
+    Chạy lệnh:
+    ```bash
+    flutter pub get
+    cd ios
+    pod install
+    ```
+    - Tại project của bạn thêm Push Notifications và tích chọn Voice over IP, Background fetch, Remote notifications, Background processing (Background Modes) trong Capabilities.
+    ![5](/assets/5.png) ![6](/assets/6.png)
+    - Khi khởi động ứng dụng [callkeep](https://github.com/Voip24h-Corp/callkeep) sẽ tạo mã thông báo đăng kí cho ứng dụng khách. Sử dụng mã này để đăng kí lên server [Voip24h](https://voip24h.vn/)
+    ```
+    ```
 
 ## Graph
 > • key và security certificate(secert) do `Voip24h` cung cấp
