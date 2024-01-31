@@ -192,6 +192,65 @@ import 'package:voip24h_sdk_mobile/callkit/model/sip_configuration.dart';
     ![5](/assets/5.png) ![6](/assets/6.png)
     - Khi khởi động ứng dụng [callkeep](https://github.com/Voip24h-Corp/callkeep) sẽ tạo mã thông báo đăng kí cho ứng dụng khách. Sử dụng mã này để đăng kí lên server [Voip24h](https://voip24h.vn/)
     ```
+    import 'package:callkeep/callkeep.dart';
+    ...
+    callKeep.on<CallKeepPushKitToken>((value) => {
+      tokenPushIOS = value.token ?? ""
+    });
+    callKeep.setup(context, <String, dynamic>{
+      'ios': {
+        'appName': 'Example',
+      }
+    });
+
+    // tokenGraph: access token được generate từ API Graph
+	// token: token device pushkit
+    // sipConfiguration: thông số sip khi đăng kí máy nhánh
+    // isIOS: mặc định là false
+    // appId: bundle id của app ios
+    // isProduction: true(production) / false(dev)
+    // deviceMac: device mac của thiết bị
+
+    Voip24hSdkMobile.pushNotificationModule.registerPushNotification(
+          tokenGraph: tokenGraph,
+          token: tokenPushIOS,
+          sipConfiguration: sipConfiguration,
+          isIOS: true,
+          appId: packageInfo.packageName,
+          isProduction: false,
+          deviceMac: iosDeviceInfo.identifierForVendor
+      ).then((value) => {
+        print(value)
+      }, onError: (error) => {
+        print(error)
+      });
+    ```
+    > Phải cấp quyền thông báo trên ios trước khi sử dụng tính năng Push Notification
+    - Đăng kí nhận thông báo đẩy từ Voip24h Server
+    > • Important Note: Sau khi nhận thông báo đẩy từ Voip24h Server, như đã đề cập cơ chế [Callkit](https://developer.apple.com/documentation/callkit/), [PushKit](https://developer.apple.com/documentation/pushkit) ở trên thì phải hiển thị màn hình cuộc gọi của hệ thống (cuộc gọi giả) trước, thực thi Login lại máy nhánh ngay sau đó để nhận tín hiệu cuộc gọi thật từ Voip24h thông qua bản tin event Ring, lúc này mọi action call như answer/reject mới hoạt động.
+    ```
+    callKeep.on<CallKeepReceivedPushNotification>((value) => {
+      callId = value.callId ?? "",
+      testCallKit()
+    });
+    callKeep.on<CallKeepPerformAnswerCallAction>((value) => {
+      answer()
+    });
+    callKeep.on<CallKeepPerformEndCallAction>((value) => {
+      reject()
+    });
+    ```
+    - Để huỷ đăng kí nhận Push Notification
+    ```
+    Voip24hSdkMobile.pushNotificationModule.unregisterPushNotification(
+        sipConfiguration: sipConfiguration,
+        isIOS: true,
+        appId: packageInfo.packageName
+    ).then((value) => {
+      print(value)
+    }, onError: (error) => {
+      print(error)
+    });
     ```
 
 ## Graph
