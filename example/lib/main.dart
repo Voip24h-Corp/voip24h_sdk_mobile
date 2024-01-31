@@ -1,6 +1,6 @@
 import 'dart:io';
-// import 'package:firebase_core/firebase_core.dart';
-// import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:callkeep/callkeep.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -20,7 +20,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 
 // region Setup Firebase messaging
-// FirebaseMessaging messaging = FirebaseMessaging.instance;
+FirebaseMessaging messaging = FirebaseMessaging.instance;
 late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 bool isFlutterLocalNotificationsInitialized = false;
 late AndroidNotificationChannel channel;
