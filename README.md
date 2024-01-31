@@ -204,7 +204,7 @@ import 'package:voip24h_sdk_mobile/callkit/model/sip_configuration.dart';
     });
 
     // tokenGraph: access token được generate từ API Graph
-	// token: token device pushkit
+    // token: token device pushkit
     // sipConfiguration: thông số sip khi đăng kí máy nhánh
     // isIOS: mặc định là false
     // appId: bundle id của app ios
@@ -252,6 +252,78 @@ import 'package:voip24h_sdk_mobile/callkit/model/sip_configuration.dart';
       print(error)
     });
     ```
+- Android: Chúng tôi sử dụng Firebase Cloud Messaging (FCM) cho thông báo đẩy cuộc gọi đến khi app ở trạng thái background
+  + Step 1: Tạo API Token
+  	- Tạo dự án trong bảng điều khiển [Firebase](https://console.firebase.google.com/) \
+  		![1](/assets/1.png)
+	- Đăng kí app Android \
+  		![2](/assets/2.png)
+  	- Download file google-services.json và thêm Firebase SDK vào project app của bạn \
+  		![3](/assets/3.png)
+	- Trong Project settings Firebase, tạo token Cloud Messaging API (Legacy) và submit token này cho [Voip24h](https://voip24h.vn/) cấu hình \
+  		![4](/assets/4.png)
+  + Step 2: Cấu hình project app của bạn để nhận thông báo đẩy cuộc gọi đến -> chúng tôi khuyến khích bạn sử dụng thư viện [Firebase Messaging](https://firebase.flutter.dev/docs/messaging/overview)
+  	- Flutter packages:
+	```
+	flutter pub add firebase_core
+	flutter pub add firebase_messaging
+	```
+	> Theo dõi docs [Firebase Messaging](https://firebase.flutter.dev/docs/messaging/overview) để cấu hình project app của bạn
+   	- Khi khởi động ứng dụng [Firebase Messaging](https://firebase.flutter.dev/docs/messaging/overview) sẽ tạo mã thông báo đăng kí cho ứng dụng khách. Sử dụng mã này để đăng kí lên server [Voip24h](https://voip24h.vn/)
+  	```
+   	String? token = await messaging.getToken();
+        ....
+   	if(token != null) {
+          // tokenGraph: access token được generate từ API Graph
+	  // token: token device push firebase
+	  // sipConfiguration: thông số sip khi đăng kí máy nhánh
+	  // isAndroid: mặc định là false
+	  // appId: package id của app android
+	  // isProduction: true(production) / false(dev)
+	  // deviceMac: device mac của thiết bị
+   
+   	  Voip24hSdkMobile.pushNotificationModule.registerPushNotification(
+		tokenGraph: tokenGraph,
+		token: token,
+		sipConfiguration: sipConfiguration,
+		isAndroid: true,
+		appId: packageInfo.packageName,
+		isProduction: false,
+		deviceMac: androidDeviceInfo.androidId
+	    ).then((value) => {
+	      print(value)
+	    }, onError: (error) => {
+	      print(error)
+	    });
+   	}	
+   	```
+   	- Phiên bản từ Android 13 (SDK 32) trở đi sẽ yêu cầu quyền thông báo để nhận Push Notification https://developer.android.com/develop/ui/views/notifications/notification-permission. Vui lòng cấp quyền runtime POST_NOTIFICATIONS trước khi sử dụng
+    	- Cấu hình nhận thông báo đẩy. Khi nhận thông báo đẩy, vui lòng đăng kí lại máy nhánh để nhận tín hiệu cuộc gọi đến
+       	```
+        @pragma('vm:entry-point')
+		Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+		  if(Platform.isAndroid) {
+		    print("Handling a background message: ${message.data}");
+		    await Firebase.initializeApp().whenComplete(() => {
+		      localNotificationService.initialNotification().then((value) => {
+			// register sip account here
+		      })
+		    });
+		  }
+		}
+        ```
+        - Huỷ đăng kí nhận Push Notification
+      	```
+        Voip24hSdkMobile.pushNotificationModule.unregisterPushNotification(
+	        sipConfiguration: sipConfiguration,
+	        isAndroid: true,
+	        appId: packageInfo.packageName
+	    ).then((value) => {
+	      print(value)
+	    }, onError: (error) => {
+	      print(error)
+	    });
+       	```
 
 ## Graph
 > • key và security certificate(secert) do `Voip24h` cung cấp
