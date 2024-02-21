@@ -299,31 +299,31 @@ import 'package:voip24h_sdk_mobile/callkit/model/sip_configuration.dart';
    	```
    	- Phiên bản từ Android 13 (SDK 32) trở đi sẽ yêu cầu quyền thông báo để nhận Push Notification https://developer.android.com/develop/ui/views/notifications/notification-permission. Vui lòng cấp quyền runtime POST_NOTIFICATIONS trước khi sử dụng
     	- Cấu hình nhận thông báo đẩy. Khi nhận thông báo đẩy, vui lòng đăng kí lại máy nhánh để nhận tín hiệu cuộc gọi đến
-       	```
-        @pragma('vm:entry-point')
-		Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-		  if(Platform.isAndroid) {
-		    print("Handling a background message: ${message.data}");
-		    await Firebase.initializeApp().whenComplete(() => {
-		      localNotificationService.initialNotification().then((value) => {
-			// register sip account here
-		      })
-		    });
-		  }
-		}
-        ```
+	       	```
+	        @pragma('vm:entry-point')
+			Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+			  if(Platform.isAndroid) {
+			    print("Handling a background message: ${message.data}");
+			    await Firebase.initializeApp().whenComplete(() => {
+			      localNotificationService.initialNotification().then((value) => {
+				// register sip account here
+			      })
+			    });
+			  }
+			}
+	        ```
         - Huỷ đăng kí nhận Push Notification
-      	```
-        Voip24hSdkMobile.pushNotificationModule.unregisterPushNotification(
-	        sipConfiguration: sipConfiguration,
-	        isAndroid: true,
-	        appId: packageInfo.packageName
-	    ).then((value) => {
-	      print(value)
-	    }, onError: (error) => {
-	      print(error)
-	    });
-       	```
+	      ```
+	      Voip24hSdkMobile.pushNotificationModule.unregisterPushNotification(
+		        sipConfiguration: sipConfiguration,
+		        isAndroid: true,
+		        appId: packageInfo.packageName
+		    ).then((value) => {
+		      print(value)
+		    }, onError: (error) => {
+		      print(error)
+		    });
+	      ```
 
 ## Graph
 > • key và security certificate(secert) do `Voip24h` cung cấp
