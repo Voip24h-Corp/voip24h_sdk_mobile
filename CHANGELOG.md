@@ -1,3 +1,7 @@
+## 0.0.3
+
+* Nâng cấp các gói phụ thuộc
+
 ## 0.0.2
 
 * Tích hợp tính năng Push Notification
