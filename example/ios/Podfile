@@ -27,8 +27,7 @@ require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelpe
 
 flutter_ios_podfile_setup
 
-platform :ios, '11.0'
-source "https://gitlab.linphone.org/BC/public/podspec.git"
+platform :ios, '12.0'
 
 target 'Runner' do
   use_frameworks!
@@ -36,7 +35,6 @@ target 'Runner' do
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 
-  pod 'linphone-sdk-novideo' , '5.1.36'
 end
 
 post_install do |installer|

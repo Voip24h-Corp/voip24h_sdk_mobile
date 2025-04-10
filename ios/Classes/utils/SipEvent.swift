@@ -27,7 +27,7 @@ enum SipEvent : String {
     /// Status call release
     case Released = "Released"
     case PushReceive = "PushReceive"
-    ///  Token receivce
+    ///  Token receive
     case PushToken = "PushToken"
 }
 

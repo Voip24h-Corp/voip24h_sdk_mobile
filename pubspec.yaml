@@ -1,11 +1,11 @@
 name: voip24h_sdk_mobile
 description: Flutter Voip24h-SDK Mobile
-version: 0.0.3
+version: 0.0.4
 author: nguyentanphat.12041998@gmail.com
 homepage: https://github.com/Voip24h-Corp/voip24h_sdk_mobile.git
 
 environment:
-  sdk: ">=2.17.6 <3.0.0"
+  sdk: ">=2.17.6 <4.0.0"
   flutter: ">=2.5.0"
 
 dependencies:

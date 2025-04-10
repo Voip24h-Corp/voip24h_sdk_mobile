@@ -6,10 +6,8 @@
 //
 
 import Foundation
-import linphonesw
 
-
-class SipConfiguaration: Decodable {
+class SipConfiguration: Decodable {
     
     var ext: String!
     var password: String!

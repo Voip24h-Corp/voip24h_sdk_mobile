@@ -7,13 +7,13 @@ class LocalNotificationService {
   Future<void> initialNotification() async {
     AndroidInitializationSettings initializationAndroidSettings = const AndroidInitializationSettings('@drawable/launch_background');
 
-    var initializationIOSSettings = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestCriticalPermission: true,
-      requestSoundPermission: true,
-      onDidReceiveLocalNotification: (int id, String? title, String? body, String? payload) async {}
-    );
+    // var initializationIOSSettings = DarwinInitializationSettings(
+    //   requestAlertPermission: true,
+    //   requestBadgePermission: true,
+    //   requestCriticalPermission: true,
+    //   requestSoundPermission: true,
+    //   onDidReceiveLocalNotification: (int id, String? title, String? body, String? payload) async {}
+    // );
 
     var initializationSettings = InitializationSettings(android: initializationAndroidSettings);
     await _notificationsPlugin.initialize(initializationSettings);
