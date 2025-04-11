@@ -1,3 +1,8 @@
+## 0.0.4
+
+* Nâng cấp GraphModule, CallModule
+* Bổ sung tính năng cấu hình codecs
+
 ## 0.0.3
 
 * Nâng cấp các gói phụ thuộc

@@ -117,26 +117,27 @@ import 'package:voip24h_sdk_mobile/callkit/model/sip_configuration.dart';
     ```
 
 
-| <div style="text-align: center">Chức năng</div> | <div style="text-align: center">Phương thức và tham số <br> (Dùng cơ chế async/await hoặc then để lấy dữ liệu trả về)</div> | Kết quả trả về và thuộc tính |
-| :--- | :--- | :---: |
-| Khởi tạo | Voip24hSdkMobile.callModule.initSipModule(sipConfiguration) | None |
-| Lấy trạng thái đăng kí tài khoản SIP | Voip24hSdkMobile.callModule.getSipRegistrationState() | value: `String` <br> error: `String` |
-| Logout tài khoản SIP | Voip24hSdkMobile.callModule.unregisterSipAccount() | value: `bool` <br> error: `String` |
-| Refresh kết nối SIP | Voip24hSdkMobile.callModule.refreshSipAccount() | value: `bool` <br> error: `String` |
-| Gọi đi | Voip24hSdkMobile.callModule.call(phoneNumber) | value: `bool` <br> error: `String` |
-| Ngắt máy | Voip24hSdkMobile.callModule.hangup() | value: `bool` <br> error: `String` |
-| Chấp nhận cuộc gọi đến | Voip24hSdkMobile.callModule.answer() | value: `bool` <br> error: `String` |
-| Từ chối cuộc gọi đến | Voip24hSdkMobile.callModule.reject() | value: `bool` <br> error: `String` |
-| Transfer cuộc gọi | Voip24hSdkMobile.callModule.transfer("extension") | value: `bool` <br> error: `String` |
-| Lấy call id | Voip24hSdkMobile.callModule.getCallId() | value: `String` <br> error: `String`   |
-| Lấy số lượng cuộc gọi nhỡ | Voip24hSdkMobile.callModule.getMissedCalls() | value: `int` <br> error: `String` |
-| Pause cuộc gọi | Voip24hSdkMobile.callModule.pause() | value: `bool` <br> error: `String` |
-| Resume cuộc gọi | Voip24hSdkMobile.callModule.resume() | value: `bool` <br> error: `String` |
-| Bật/Tắt mic | Voip24hSdkMobile.callModule.toggleMic() | value: `bool` <br> error: `String` |
-| Trạng thái mic | Voip24hSdkMobile.callModule.isMicEnabled() | value: `bool` <br> error: `String` |
-| Bật/Tắt loa | Voip24hSdkMobile.callModule.toggleSpeaker() | value: `bool` <br> error: `String` |
-| Trạng thái loa | Voip24hSdkMobile.callModule.isSpeakerEnabled() | value: `bool` <br> error: `String` |
-| Send DTMF | Voip24hSdkMobile.callModule.sendDTMF("number#") | value: `bool` <br> error: `String` |
+| <div style="text-align: center">Chức năng</div> | <div style="text-align: center">Phương thức và tham số <br> (Dùng cơ chế async/await hoặc then để lấy dữ liệu trả về)</div> |     Kết quả trả về và thuộc tính     |
+|:------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------|:------------------------------------:|
+| Khởi tạo                                        | Voip24hSdkMobile.callModule.initSipModule(sipConfiguration)                                                                 |                 None                 |
+| Lấy trạng thái đăng kí tài khoản SIP            | Voip24hSdkMobile.callModule.getSipRegistrationState()                                                                       | value: `String` <br> error: `String` |
+| Logout tài khoản SIP                            | Voip24hSdkMobile.callModule.unregisterSipAccount()                                                                          |  value: `bool` <br> error: `String`  |
+| Refresh kết nối SIP                             | Voip24hSdkMobile.callModule.refreshSipAccount()                                                                             |  value: `bool` <br> error: `String`  |
+| Gọi đi                                          | Voip24hSdkMobile.callModule.call(phoneNumber)                                                                               |  value: `bool` <br> error: `String`  |
+| Ngắt máy                                        | Voip24hSdkMobile.callModule.hangup()                                                                                        |  value: `bool` <br> error: `String`  |
+| Chấp nhận cuộc gọi đến                          | Voip24hSdkMobile.callModule.answer()                                                                                        |  value: `bool` <br> error: `String`  |
+| Từ chối cuộc gọi đến                            | Voip24hSdkMobile.callModule.reject()                                                                                        |  value: `bool` <br> error: `String`  |
+| Transfer cuộc gọi                               | Voip24hSdkMobile.callModule.transfer("extension")                                                                           |  value: `bool` <br> error: `String`  |
+| Lấy call id                                     | Voip24hSdkMobile.callModule.getCallId()                                                                                     | value: `String` <br> error: `String` |
+| Lấy số lượng cuộc gọi nhỡ                       | Voip24hSdkMobile.callModule.getMissedCalls()                                                                                |  value: `int` <br> error: `String`   |
+| Pause cuộc gọi                                  | Voip24hSdkMobile.callModule.pause()                                                                                         |  value: `bool` <br> error: `String`  |
+| Resume cuộc gọi                                 | Voip24hSdkMobile.callModule.resume()                                                                                        |  value: `bool` <br> error: `String`  |
+| Bật/Tắt mic                                     | Voip24hSdkMobile.callModule.toggleMic()                                                                                     |  value: `bool` <br> error: `String`  |
+| Trạng thái mic                                  | Voip24hSdkMobile.callModule.isMicEnabled()                                                                                  |  value: `bool` <br> error: `String`  |
+| Bật/Tắt loa                                     | Voip24hSdkMobile.callModule.toggleSpeaker()                                                                                 |  value: `bool` <br> error: `String`  |
+| Trạng thái loa                                  | Voip24hSdkMobile.callModule.isSpeakerEnabled()                                                                              |  value: `bool` <br> error: `String`  |
+| Send DTMF                                       | Voip24hSdkMobile.callModule.sendDTMF("number#")                                                                             |  value: `bool` <br> error: `String`  |
+| Codecs                                          | Voip24hSDK.callModule.setCodecs(codecs, isEnable)                                                                           |  value: `bool` <br> error: `String`  |
 
 * ### Event listener SIP:
 
