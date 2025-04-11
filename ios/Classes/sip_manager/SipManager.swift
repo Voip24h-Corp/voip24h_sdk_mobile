@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import linphonesw
 
 class SipManager {
     
@@ -147,7 +146,7 @@ class SipManager {
         SwiftVoip24hSdkMobilePlugin.eventSink?(data)
     }
     
-    public func initSipModule(sipConfiguration: SipConfiguaration) {
+    public func initSipModule(sipConfiguration: SipConfiguration) {
         do {
             mCore.keepAliveEnabled = sipConfiguration.isKeepAlive
             try mCore.start()
@@ -519,6 +518,16 @@ class SipManager {
         let currentAudioDevice = mCore.currentCall?.outputAudioDevice
         let speakerEnabled = currentAudioDevice?.type == AudioDeviceType.Speaker
         result(speakerEnabled)
+    }
+
+    func setCodecs(codecs: String, isEnable: Bool, result: FlutterResult) {
+        let payload = mCore.audioPayloadTypes.first { $0.mimeType.caseInsensitiveCompare(codecs) == .orderedSame }
+        if payload == nil {
+            NSLog("Invalid codec")
+            result(false)
+        }
+        let _ = payload!.enable(enabled: isEnable)
+        result(true)
     }
     
     // func removeListener() {

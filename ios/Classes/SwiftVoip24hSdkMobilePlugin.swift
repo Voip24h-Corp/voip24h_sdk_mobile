@@ -28,7 +28,7 @@ public class SwiftVoip24hSdkMobilePlugin: NSObject, FlutterPlugin, FlutterStream
             if(jsonString == nil) {
                 return NSLog("Sip configuration is not valid")
             }
-            let sipConfiguration = SipConfiguaration.toObject(JSONString: jsonString!)
+            let sipConfiguration = SipConfiguration.toObject(JSONString: jsonString!)
             if(sipConfiguration == nil) {
                 return NSLog("Sip configuration is not valid")
             }
@@ -108,6 +108,15 @@ public class SwiftVoip24hSdkMobilePlugin: NSObject, FlutterPlugin, FlutterStream
             break
         case "registerPush":
             registerPush()
+            break
+        case "setCodecs":
+            let codecs = (call.arguments as? [String:Any])?["codecs"] as? String
+            let isEnable = (call.arguments as? [String:Any])?["isEnable"] as? Bool
+            if(codecs == nil || isEnable == nil) {
+                // NSLog("Extension is not valid")
+                return result(FlutterError(code: "500", message: "Codecs or IsEnable is not valid", details: nil))
+            }
+            sipManager.setCodecs(codecs: codecs!, isEnable: isEnable!, result: result)
             break
         default:
             result(FlutterMethodNotImplemented)

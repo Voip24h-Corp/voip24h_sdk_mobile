@@ -14,7 +14,7 @@ enum RegisterSipState : String, CaseIterable {
     case Progress = "Progress"
     /// Registration is successful.
     case Ok = "Ok"
-    /// Unregistration succeeded.
+    /// UnRegistration succeeded.
     case Cleared = "Cleared"
     /// Registration failed.
     case Failed = "Failed"

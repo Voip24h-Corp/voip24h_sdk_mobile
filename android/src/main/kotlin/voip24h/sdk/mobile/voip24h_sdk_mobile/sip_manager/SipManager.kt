@@ -454,14 +454,27 @@ internal class SipManager private constructor(context: Context) {
     }
 
     // fun removeListener() {
-        // mCore.removeListener(coreListener)
+    // mCore.removeListener(coreListener)
     // }
+
+    fun setCodecs(codecs: String, isEnable: Boolean, result: Result) {
+        try {
+            mCore.audioPayloadTypes.find { it.mimeType.contains(codecs, true) }?.enable(isEnable) ?: kotlin.run {
+                Log.d(TAG, "Invalid codec")
+                result.success(false)
+            }
+            result.success(true)
+        } catch (e: Exception) {
+            Log.d(TAG, e.message.toString())
+            result.error("500", e.message.toString(), null)
+        }
+    }
 
     private fun isMissed(callLog: CallLog?): Boolean {
         return (callLog?.dir == Call.Dir.Incoming && callLog.status == Call.Status.Missed)
     }
 
-    private fun createParams(event: String, vararg params: Pair<String, Any>) : Map<String, Any> {
+    private fun createParams(event: String, vararg params: Pair<String, Any>): Map<String, Any> {
         return mapOf("event" to event, "body" to params.toMap())
     }
 

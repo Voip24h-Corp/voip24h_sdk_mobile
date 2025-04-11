@@ -46,13 +46,13 @@ class Voip24hSdkMobilePlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
           sipManager.initSipModule(sipConfiguration)
           result.success("Init sip module successful")
         } ?: kotlin.run {
-          result.error("404", "Sip configuration is not valid", null)
+          result.error("500", "Sip configuration is not valid", null)
         }
       }
       "call" -> {
         val phoneNumber = call.argument<String>("recipient")
         if (phoneNumber.isNullOrEmpty()) {
-          return result.error("404", "Phone number is null or empty", null)
+          return result.error("500", "Phone number is null or empty", null)
         }
         sipManager.call(phoneNumber, result)
       }
@@ -68,7 +68,7 @@ class Voip24hSdkMobilePlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
       "transfer" -> {
         val extension = call.argument<String>("extension")
         if (extension.isNullOrEmpty()) {
-          return result.error("404", "Extension is null or empty", null)
+          return result.error("500", "Extension is null or empty", null)
         }
         sipManager.transfer(extension, result)
       }
@@ -81,7 +81,7 @@ class Voip24hSdkMobilePlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
       "sendDTMF" -> {
         val dtmf = call.argument<String>("recipient")
         if (dtmf.isNullOrEmpty()) {
-          return result.error("404", "DTMF is null or empty", null)
+          return result.error("500", "DTMF is null or empty", null)
         }
         sipManager.sendDTMF(dtmf, result)
       }
@@ -109,6 +109,7 @@ class Voip24hSdkMobilePlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
       "isMicEnabled" -> {
         sipManager.isMicEnabled(result)
       }
+
       "isSpeakerEnabled" -> {
         sipManager.isSpeakerEnabled(result)
       }
@@ -118,6 +119,16 @@ class Voip24hSdkMobilePlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
       "getPlatformVersion" -> {
         result.success("Android ${android.os.Build.VERSION.RELEASE}")
       }
+
+      "setCodecs" -> {
+        val codecs = call.argument<String>("codecs")
+        val isEnable = call.argument<Boolean>("isEnable")
+        if (codecs.isNullOrEmpty() || isEnable == null) {
+          return result.error("500", "Codecs or enable is null or empty", null)
+        }
+        sipManager.setCodecs(codecs, isEnable, result)
+      }
+
       else -> {
         result.notImplemented()
       }

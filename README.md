@@ -45,7 +45,13 @@ Sử dụng terminal:
 flutter pub add voip24h_sdk_mobile
 ```
 Linking module:
-- IOS:
+- Phiên bản từ v0.0.4 trở lên: không cần thực hiện linking module trong `ios/Podfile`
+    - Trong folder `ios` mở terminal, nhập dòng lệnh:
+        ```bash
+        rm -rf Pods/
+        pod install
+        ```
+- IOS (chỉ áp dụng với phiên bản v0.0.3 trở xuống):
     - Trong `ios/Podfile`:
         ```
         ...
@@ -71,6 +77,22 @@ Linking module:
         ```
 
 ## Khai báo module
+
+- Phiên bản v0.0.4 trở lên:
+
+```
+import 'package:voip24h_sdk_mobile/Voip24hSDK.dart';
+import 'package:voip24h_sdk_mobile/extensions/Extensions.dart';
+import 'package:voip24h_sdk_mobile/models/SipConfiguration.dart';
+import 'package:voip24h_sdk_mobile/utils/CallEvent.dart';
+import 'package:voip24h_sdk_mobile/utils/Codecs.dart';
+import 'package:voip24h_sdk_mobile/utils/GraphRoute.dart';
+import 'package:voip24h_sdk_mobile/utils/TransportType.dart';
+import 'package:voip24h_sdk_mobile_example/LocalNotificationService.dart';
+```
+
+- Phiên bản v0.0.3 trở xuống:
+
 ```
 import 'package:voip24h_sdk_mobile/voip24h_sdk_mobile.dart';
 import 'package:voip24h_sdk_mobile/callkit/utils/sip_event.dart';
@@ -83,6 +105,7 @@ import 'package:voip24h_sdk_mobile/callkit/model/sip_configuration.dart';
 
 ## CallKit
 
+> Lưu ý quan trọng: Từ phiên bản v0.0.4 trở lên thay đổi tên module từ Voip24hSdkMobile thành Voip24hSDK và SipEvent sẽ thay đổi thành CallEvent
 * ### Khai báo sipConfiguration:
 
     ```
@@ -326,18 +349,24 @@ import 'package:voip24h_sdk_mobile/callkit/model/sip_configuration.dart';
 	      ```
 
 ## Graph
-> • key và security certificate(secert) do `Voip24h` cung cấp
+
+> Từ phiên bản v0.0.4 trở lên function sendRequest thay đổi thành phương thức truyền tham số:
+<br> • Voip24hSDK.graphModule.sendRequest(token, route, params)
+<br> Example: Voip24hSDK.graphModule.sendRequest(token: oauth.token, route: GraphRoute.CallLog, params: body)
+
+> Áp dụng cho phiên bản từ v0.0.3 trở xuống
+<br>• key và security certificate(secert) do `Voip24h` cung cấp
 <br> • request api: phương thức, endpoint. data body tham khảo từ docs https://docs-sdk.voip24h.vn/
 
-| <div style="text-aligns: center">Chức năng</div> | <div style="text-aligns: center">Phương thức</div> | <div style="text-aligns: center">Đặc tả tham số </div> | <div style="text-aligns: center">Kết quả trả về</div> | <div style="text-aligns: center">Đặc tả thuộc tính</div> |
-| :--- | :--- | :--- | :--- | :--- |
-| Lấy access token | Voip24hSdkMobile.graphModule.getAccessToken(apiKey: API_KEY, apiSecert: API_SECERT) | • apiKey: ``String``, <br> • secert: ``String`` | value: `Oauth` <br> error: ``String`` | • Oauth: gồm các thuộc tính (token, createAt, expired, isLongAlive) <br> • error: thông báo lỗi |
-| Request API | Voip24hSdkMobile.graphModule.sendRequest(token: token, endpoint: endpoint, body: body) | • method: MethodRequest(MethodRequest.POST, MethodRequest.GET,...) <br> • endpoint: chuỗi cuối của URL request: "call/find", "call/findone",... <br> • token: access token <br> • params: data body dạng object như { "offset": "0", "limit": "25" } | value: `Map<`String`, dynamic>` <br> error: ``String`` | • value: kết quả response dạng key - value <br> • error: mã lỗi |
-| Lấy data object | value.getData() <br> (Dạng extension function) | None | object: `Object` | object gồm các thuộc tính được mô tả ở dữ liệu trả về trong docs https://docs-sdk.voip24h.vn/ |
-| Lấy danh sách data object | value.getDataList() <br> (Dạng extension function) |  | List`<Object>` | mỗi object gồm các thuộc tính được mô tả ở dữ liệu trả về trong docs https://docs-sdk.voip24h.vn/ |
-| Lấy status code | value.statusCode() <br> (Dạng extension function) |  | `int` | mã trạng thái |
-| Lấy message | value.message() <br> (Dạng extension function) |  | `String` | chuỗi mô tả trạng thái |
-| Lấy limit | value.limit() <br> (Dạng extension function) |  | `int` | giới hạn dữ liệu của dữ liệu tìm được |
-| Lấy offset | value.offset() <br> (Dạng extension function) |  | `int` | vị trí bắt đầu của dữ liệu tìm được |
-| Lấy total | value.total() <br> (Dạng extension function) |  | `int` | tổng số lượng dữ liệu |
-| Lấy kiểu sắp xếp | value.isSort() <br> (Dạng extension function) |  | `String` | kiểu sắp xếp dữ liệu |
+| <div style="text-aligns: center">Chức năng</div> | <div style="text-aligns: center">Phương thức</div>                                     | <div style="text-aligns: center">Đặc tả tham số </div>                                                                                                                                                                                               | <div style="text-aligns: center">Kết quả trả về</div>  | <div style="text-aligns: center">Đặc tả thuộc tính</div>                                          |
+|:-------------------------------------------------|:---------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------|:--------------------------------------------------------------------------------------------------|
+| Lấy access token                                 | Voip24hSdkMobile.graphModule.getAccessToken(apiKey: API_KEY, apiSecert: API_SECERT)    | • apiKey: ``String``, <br> • secert: ``String``                                                                                                                                                                                                      | value: `Oauth` <br> error: ``String``                  | • Oauth: gồm các thuộc tính (token, createAt, expired, isLongAlive) <br> • error: thông báo lỗi   |
+| Request API                                      | Voip24hSdkMobile.graphModule.sendRequest(token: token, endpoint: endpoint, body: body) | • method: MethodRequest(MethodRequest.POST, MethodRequest.GET,...) <br> • endpoint: chuỗi cuối của URL request: "call/find", "call/findone",... <br> • token: access token <br> • params: data body dạng object như { "offset": "0", "limit": "25" } | value: `Map<`String`, dynamic>` <br> error: ``String`` | • value: kết quả response dạng key - value <br> • error: mã lỗi                                   |
+| Lấy data object                                  | value.getData() <br> (Dạng extension function)                                         | None                                                                                                                                                                                                                                                 | object: `Object`                                       | object gồm các thuộc tính được mô tả ở dữ liệu trả về trong docs https://docs-sdk.voip24h.vn/     |
+| Lấy danh sách data object                        | value.getDataList() <br> (Dạng extension function)                                     |                                                                                                                                                                                                                                                      | List`<Object>`                                         | mỗi object gồm các thuộc tính được mô tả ở dữ liệu trả về trong docs https://docs-sdk.voip24h.vn/ |
+| Lấy status code                                  | value.statusCode() <br> (Dạng extension function)                                      |                                                                                                                                                                                                                                                      | `int`                                                  | mã trạng thái                                                                                     |
+| Lấy message                                      | value.message() <br> (Dạng extension function)                                         |                                                                                                                                                                                                                                                      | `String`                                               | chuỗi mô tả trạng thái                                                                            |
+| Lấy limit                                        | value.limit() <br> (Dạng extension function)                                           |                                                                                                                                                                                                                                                      | `int`                                                  | giới hạn dữ liệu của dữ liệu tìm được                                                             |
+| Lấy offset                                       | value.offset() <br> (Dạng extension function)                                          |                                                                                                                                                                                                                                                      | `int`                                                  | vị trí bắt đầu của dữ liệu tìm được                                                               |
+| Lấy total                                        | value.total() <br> (Dạng extension function)                                           |                                                                                                                                                                                                                                                      | `int`                                                  | tổng số lượng dữ liệu                                                                             |
+| Lấy kiểu sắp xếp                                 | value.isSort() <br> (Dạng extension function)                                          |                                                                                                                                                                                                                                                      | `String`                                               | kiểu sắp xếp dữ liệu                                                                              |
