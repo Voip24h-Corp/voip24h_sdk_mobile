@@ -1,3 +1,7 @@
+## 0.0.6
+
+* Fix duplicate pushkit
+
 ## 0.0.5
 
 * Fix lỗi crash app khi đăng kí máy nhánh bằng giao thức TCP trên IOS

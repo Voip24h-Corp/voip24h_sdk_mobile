@@ -33,7 +33,7 @@ public class SwiftVoip24hSdkMobilePlugin: NSObject, FlutterPlugin, FlutterStream
                 return NSLog("Sip configuration is not valid")
             }
             sipManager.initSipModule(sipConfiguration: sipConfiguration!)
-            initPushKit()
+            // initPushKit()
             break
         case "call":
             let phoneNumber = (call.arguments as? [String:Any])?["recipient"] as? String
