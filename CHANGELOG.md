@@ -1,3 +1,8 @@
+## 0.0.5
+
+* Fix lỗi crash app khi đăng kí máy nhánh bằng giao thức TCP trên IOS
+* Fix lỗi không đăng kí lại được máy nhánh khác
+
 ## 0.0.4
 
 * Nâng cấp GraphModule, CallModule

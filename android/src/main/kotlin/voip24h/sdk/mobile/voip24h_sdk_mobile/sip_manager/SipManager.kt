@@ -10,6 +10,7 @@ import voip24h.sdk.mobile.voip24h_sdk_mobile.utils.*
 
 internal class SipManager private constructor(context: Context) {
 
+    private var isInitial = false
     private var timeStartStreamingRunning: Long = 0
     private var isPause = false
     private var mCore: Core
@@ -135,10 +136,14 @@ internal class SipManager private constructor(context: Context) {
     }
 
     fun initSipModule(sipConfiguration: SipConfiguration) {
-        mCore.isKeepAliveEnabled = sipConfiguration.isKeepAlive
-        mCore.start()
-        mCore.removeListener(coreListener)
-        mCore.addListener(coreListener)
+        if (!isInitial) {
+            mCore.isKeepAliveEnabled = sipConfiguration.isKeepAlive
+            mCore.maxCalls = 1
+            mCore.start()
+            mCore.removeListener(coreListener)
+            mCore.addListener(coreListener)
+            isInitial = true
+        }
         initSipAccount(sipConfiguration.extension, sipConfiguration.password, sipConfiguration.domain, sipConfiguration.port, sipConfiguration.toLpTransportType())
     }
 

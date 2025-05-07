@@ -10,6 +10,7 @@ import Foundation
 class SipManager {
     
     static let instance = SipManager()
+    private var isInitial = false
     private var mCore: Core!
     private var timeStartStreamingRunning: Int64 = 0
     private var isPause: Bool = false
@@ -148,10 +149,14 @@ class SipManager {
     
     public func initSipModule(sipConfiguration: SipConfiguration) {
         do {
-            mCore.keepAliveEnabled = sipConfiguration.isKeepAlive
-            try mCore.start()
-            mCore.removeDelegate(delegate: coreDelegate)
-            mCore.addDelegate(delegate: coreDelegate)
+            if !isInitial {
+                mCore.keepAliveEnabled = sipConfiguration.isKeepAlive
+                mCore.maxCalls = 1
+                try mCore.start()
+                mCore.removeDelegate(delegate: coreDelegate)
+                mCore.addDelegate(delegate: coreDelegate)
+                isInitial = true
+            }
             initSipAccount(ext: sipConfiguration.ext, password: sipConfiguration.password, domain: sipConfiguration.domain, port: sipConfiguration.port, transportType: sipConfiguration.toLpTransportType())
         } catch {
             NSLog(error.localizedDescription)
