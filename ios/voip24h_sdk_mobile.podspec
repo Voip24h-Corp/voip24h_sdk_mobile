@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'voip24h_sdk_mobile'
-  s.version          = '0.0.2'
+  s.version          = '0.0.7'
   s.summary          = 'Flutter Voip24h-SDK Mobile'
   s.description      = <<-DESC
 Flutter Voip24h-SDK Mobile
