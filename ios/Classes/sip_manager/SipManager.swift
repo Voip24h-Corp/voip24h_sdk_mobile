@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AVFAudio
 
 class SipManager {
     
@@ -18,6 +19,13 @@ class SipManager {
     
     private init() {
         do {
+            do {
+                let audioSession = AVAudioSession.sharedInstance()
+                try audioSession.setCategory(.playAndRecord, options: [.defaultToSpeaker, .allowBluetooth])
+                try audioSession.setActive(true)
+            } catch {
+                NSLog("Error while configuring audio session: \(error.localizedDescription)")
+            }
             try mCore = Factory.Instance.createCore(configPath: "", factoryConfigPath: "", systemContext: nil)
             coreDelegate = CoreDelegateStub(
                 onCallStateChanged: {(
@@ -153,6 +161,9 @@ class SipManager {
                 mCore.keepAliveEnabled = sipConfiguration.isKeepAlive
                 mCore.maxCalls = 1
                 try mCore.start()
+                mCore.echoCancellationEnabled = true
+                mCore.echoLimiterEnabled = true
+                mCore.adaptiveRateControlEnabled = true
                 mCore.removeDelegate(delegate: coreDelegate)
                 mCore.addDelegate(delegate: coreDelegate)
                 isInitial = true
@@ -243,7 +254,7 @@ class SipManager {
     func answer(result: FlutterResult) {
         NSLog("Try to answer")
         do {
-            let coreCall = mCore.currentCall
+            let coreCall = (mCore.currentCall != nil) ? mCore.currentCall : mCore.calls.first
             if(coreCall == nil) {
                 NSLog("Current call not found")
                 return result(false)
@@ -291,7 +302,7 @@ class SipManager {
     func reject(result: FlutterResult) {
         NSLog("Try to reject")
         do {
-            let coreCall = mCore.currentCall
+            let coreCall = (mCore.currentCall != nil) ? mCore.currentCall : mCore.calls.first
             if(coreCall == nil) {
                 NSLog("Current call not found")
                 return result(false)
@@ -404,7 +415,7 @@ class SipManager {
     
     func sendDTMF(dtmf: String, result: FlutterResult) {
         do {
-            let coreCall = mCore.currentCall
+            let coreCall = (mCore.currentCall != nil) ? mCore.currentCall : mCore.calls.first
             if(coreCall == nil) {
                 NSLog("Current call not found")
                 return result(false)
@@ -422,12 +433,12 @@ class SipManager {
     }
     
     func toggleSpeaker(result: FlutterResult) {
-        let coreCall = mCore.currentCall
+        let coreCall = (mCore.currentCall != nil) ? mCore.currentCall : mCore.calls.first
         if(coreCall == nil) {
             return result(FlutterError(code: "404", message: "Current call not found", details: nil))
         }
         let currentAudioDevice = coreCall!.outputAudioDevice
-        let speakerEnabled = currentAudioDevice?.type == AudioDeviceType.Speaker
+        let speakerEnabled = currentAudioDevice?.type == AudioDevice.Kind.Speaker
         
         // We can get a list of all available audio devices using
         // Note that on tablets for example, there may be no Earpiece device
@@ -435,10 +446,10 @@ class SipManager {
             // For IOS, the Speaker is an exception, Linphone cannot differentiate Input and Output.
             // This means that the default output device, the earpiece, is paired with the default phone microphone.
             // Setting the output audio device to the microphone will redirect the sound to the earpiece.
-            if (speakerEnabled && audioDevice.type == AudioDeviceType.Microphone) {
+            if (speakerEnabled && audioDevice.type == AudioDevice.Kind.Microphone) {
                 coreCall!.outputAudioDevice = audioDevice
                 return result(false)
-            } else if (!speakerEnabled && audioDevice.type == AudioDeviceType.Speaker) {
+            } else if (!speakerEnabled && audioDevice.type == AudioDevice.Kind.Speaker) {
                 coreCall!.outputAudioDevice = audioDevice
                 return result(true)
             }
@@ -450,7 +461,7 @@ class SipManager {
     }
     
     func toggleMic(result: FlutterResult) {
-        let coreCall = mCore.currentCall
+        let coreCall = (mCore.currentCall != nil) ? mCore.currentCall : mCore.calls.first
         if(coreCall == nil) {
             return result(FlutterError(code: "404", message: "Current call not found", details: nil))
         }
@@ -494,7 +505,8 @@ class SipManager {
     }
     
     func getCallId(result: FlutterResult) {
-        let callId = mCore.currentCall?.callLog?.callId
+        let coreCall = (mCore.currentCall != nil) ? mCore.currentCall : mCore.calls.first
+        let callId = coreCall?.callLog?.callId
         if (callId != nil && !callId!.isEmpty) {
             result(callId)
         } else {
@@ -520,8 +532,9 @@ class SipManager {
     }
     
     func isSpeakerEnabled(result: FlutterResult) {
-        let currentAudioDevice = mCore.currentCall?.outputAudioDevice
-        let speakerEnabled = currentAudioDevice?.type == AudioDeviceType.Speaker
+        let coreCall = (mCore.currentCall != nil) ? mCore.currentCall : mCore.calls.first
+        let currentAudioDevice = coreCall?.outputAudioDevice
+        let speakerEnabled = currentAudioDevice?.type == AudioDevice.Kind.Speaker
         result(speakerEnabled)
     }
 

@@ -27,7 +27,7 @@ require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelpe
 
 flutter_ios_podfile_setup
 
-platform :ios, '12.0'
+platform :ios, '13.0'
 
 target 'Runner' do
   use_frameworks!
@@ -42,60 +42,60 @@ post_install do |installer|
     flutter_additional_ios_build_settings(target)
   end
   
-  bitcode_strip_path = `xcrun --find bitcode_strip`.chop!
-    def strip_bitcode_from_framework(bitcode_strip_path, framework_relative_path)
-    framework_path = File.join(Dir.pwd, framework_relative_path)
-    command = "#{bitcode_strip_path} #{framework_path} -r -o #{framework_path}"
-    puts "Stripping bitcode: #{command}"
-    system(command)
-  end
+#   bitcode_strip_path = `xcrun --find bitcode_strip`.chop!
+#     def strip_bitcode_from_framework(bitcode_strip_path, framework_relative_path)
+#     framework_path = File.join(Dir.pwd, framework_relative_path)
+#     command = "#{bitcode_strip_path} #{framework_path} -r -o #{framework_path}"
+#     puts "Stripping bitcode: #{command}"
+#     system(command)
+#   end
 
-  framework_paths = [
-		# "../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/bctoolbox-ios.framework/bctoolbox-ios",
-		# "../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/bctoolbox.framework/bctoolbox",
-		# "../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/belcard.framework/belcard",
-		# "../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/belcard.framework/vcard_grammar",
-		# "../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/belle-sip.framework/belle-sip",
-		# "../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/belle-sip.framework/sdp_grammar",
-		# "../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/belr.framework/belr",
-		# "../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/lime.framework/lime",
-		# "../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/linphone.framework/linphone",
-		# "../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/linphone.framework/cpim_grammar",
-		# "../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/linphone.framework/ics_grammar",
-		# "../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/linphone.framework/identity_grammar",
-		# "../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/linphonetester.framework/linphonetester",
-		# "../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/mediastreamer2.framework/mediastreamer2",
-		# "../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/msamr.framework/msamr",
-		# "../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/mscodec2.framework/mscodec2",
-		# "../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/msopenh264.framework/msopenh264",
-		# "../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/mssilk.framework/mssilk",
-		# "../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/mswebrtc.framework/mswebrtc",
-		# "../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/msx264.framework/msx264",
-		# "../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/ortp.framework/ortp",
-    ".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/bctoolbox-ios.framework/bctoolbox-ios",
-		".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/bctoolbox.framework/bctoolbox",
-		".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/belcard.framework/belcard",
-		".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/belcard.framework/vcard_grammar",
-		".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/belle-sip.framework/belle-sip",
-		".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/belle-sip.framework/sdp_grammar",
-		".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/belr.framework/belr",
-		".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/lime.framework/lime",
-		".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/linphone.framework/linphone",
-		".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/linphone.framework/cpim_grammar",
-		".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/linphone.framework/ics_grammar",
-		".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/linphone.framework/identity_grammar",
-		".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/linphonetester.framework/linphonetester",
-		".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/mediastreamer2.framework/mediastreamer2",
-		".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/msamr.framework/msamr",
-		".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/mscodec2.framework/mscodec2",
-		".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/msopenh264.framework/msopenh264",
-		".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/mssilk.framework/mssilk",
-		".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/mswebrtc.framework/mswebrtc",
-		".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/msx264.framework/msx264",
-		".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/ortp.framework/ortp",
-  ]
+#   framework_paths = [
+# 		"../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/bctoolbox-ios.framework/bctoolbox-ios",
+# 		"../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/bctoolbox.framework/bctoolbox",
+# 		"../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/belcard.framework/belcard",
+# 		"../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/belcard.framework/vcard_grammar",
+# 		"../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/belle-sip.framework/belle-sip",
+# 		"../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/belle-sip.framework/sdp_grammar",
+# 		"../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/belr.framework/belr",
+# 		"../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/lime.framework/lime",
+# 		"../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/linphone.framework/linphone",
+# 		"../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/linphone.framework/cpim_grammar",
+# 		"../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/linphone.framework/ics_grammar",
+# 		"../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/linphone.framework/identity_grammar",
+# 		"../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/linphonetester.framework/linphonetester",
+# 		"../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/mediastreamer2.framework/mediastreamer2",
+# 		"../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/msamr.framework/msamr",
+# 		"../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/mscodec2.framework/mscodec2",
+# 		"../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/msopenh264.framework/msopenh264",
+# 		"../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/mssilk.framework/mssilk",
+# 		"../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/mswebrtc.framework/mswebrtc",
+# 		"../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/msx264.framework/msx264",
+# 		"../voip24h_sdk_mobile/voip-callkit/apple-darwin/Frameworks/ortp.framework/ortp",
+#     ".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/bctoolbox-ios.framework/bctoolbox-ios",
+#     ".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/bctoolbox.framework/bctoolbox",
+#     ".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/belcard.framework/belcard",
+#     ".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/belcard.framework/vcard_grammar",
+#     ".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/belle-sip.framework/belle-sip",
+#     ".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/belle-sip.framework/sdp_grammar",
+#     ".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/belr.framework/belr",
+#     ".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/lime.framework/lime",
+#     ".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/linphone.framework/linphone",
+#     ".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/linphone.framework/cpim_grammar",
+#     ".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/linphone.framework/ics_grammar",
+#     ".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/linphone.framework/identity_grammar",
+#     ".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/linphonetester.framework/linphonetester",
+#     ".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/mediastreamer2.framework/mediastreamer2",
+#     ".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/msamr.framework/msamr",
+#     ".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/mscodec2.framework/mscodec2",
+#     ".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/msopenh264.framework/msopenh264",
+#     ".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/mssilk.framework/mssilk",
+#     ".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/mswebrtc.framework/mswebrtc",
+#     ".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/msx264.framework/msx264",
+#     ".symlinks/plugins/voip24h_sdk_mobile/ios/voip-callkit/apple-darwin/Frameworks/ortp.framework/ortp",
+#   ]
 
-  framework_paths.each do |framework_relative_path|
-    strip_bitcode_from_framework(bitcode_strip_path, framework_relative_path)
-  end
+#   framework_paths.each do |framework_relative_path|
+#     strip_bitcode_from_framework(bitcode_strip_path, framework_relative_path)
+#   end
 end
