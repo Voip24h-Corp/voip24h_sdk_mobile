@@ -77,12 +77,12 @@ Future<void> setupCallKit() async {
           if (body['callType'] == "inbound") {
             if (Platform.isIOS) {
               if (callId.isNotEmpty) {
-                callKeep.updateDisplay(callId, callerName: "updated", handle: "generic");
+                callKeep.updateDisplay(uuid: callId, callerName: "updated", handle: "generic");
               } else {
                 const uuid = Uuid();
                 String newUuid = uuid.v4();
                 callId = newUuid;
-                callKeep.displayIncomingCall(newUuid, "generic", callerName: body['phoneNumber']);
+                callKeep.displayIncomingCall(uuid: newUuid, handle: "generic", callerName: body['phoneNumber']);
               }
             } else if (Platform.isAndroid) {
               localNotificationService.showNotification(body: "Incoming call ${body['phoneNumber']}");
@@ -313,7 +313,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   void registerPushForIOS() async {
-    if(tokenPushIOS.isNotEmpty) {
+    if (tokenPushIOS.isNotEmpty) {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
       IosDeviceInfo iosDeviceInfo = await deviceInfo.iosInfo;
@@ -347,7 +347,7 @@ class _MyAppState extends State<MyApp> {
     callKeep.on<CallKeepPerformEndCallAction>((value) {
       reject();
     });
-    callKeep.setup(context, <String, dynamic>{
+    callKeep.setup(options: {
       'ios': {
         'appName': 'Example',
       }

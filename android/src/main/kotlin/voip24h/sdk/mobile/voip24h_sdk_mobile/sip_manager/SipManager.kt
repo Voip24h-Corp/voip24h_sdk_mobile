@@ -137,11 +137,16 @@ internal class SipManager private constructor(context: Context) {
 
     fun initSipModule(sipConfiguration: SipConfiguration) {
         if (!isInitial) {
-            mCore.isKeepAliveEnabled = sipConfiguration.isKeepAlive
-            mCore.maxCalls = 1
-            mCore.start()
-            mCore.removeListener(coreListener)
-            mCore.addListener(coreListener)
+            mCore.apply {
+                isKeepAliveEnabled = sipConfiguration.isKeepAlive
+                maxCalls = 1
+                start()
+                isEchoCancellationEnabled = true
+                isEchoLimiterEnabled = true
+                isAdaptiveRateControlEnabled = true
+                removeListener(coreListener)
+                addListener(coreListener)
+            }
             isInitial = true
         }
         initSipAccount(sipConfiguration.extension, sipConfiguration.password, sipConfiguration.domain, sipConfiguration.port, sipConfiguration.toLpTransportType())
@@ -186,7 +191,7 @@ internal class SipManager private constructor(context: Context) {
     fun answer(result: Result) {
         Log.d(TAG, "Try to accept call")
         try {
-            val currentCall = mCore.currentCall
+            val currentCall = mCore.currentCall ?: mCore.calls.firstOrNull()
             if(currentCall == null) {
                 Log.d(TAG, "Current call not found")
                 return result.success(false)
@@ -202,9 +207,9 @@ internal class SipManager private constructor(context: Context) {
     }
 
     fun reject(result: Result) {
-        Log.d(TAG, "Try to accept call")
+        Log.d(TAG, "Try to reject call")
         try {
-            val currentCall = mCore.currentCall
+            val currentCall = mCore.currentCall ?: mCore.calls.firstOrNull()
             if(currentCall == null) {
                 Log.d(TAG, "Current call not found")
                 return result.success(false)
@@ -354,7 +359,7 @@ internal class SipManager private constructor(context: Context) {
 
     fun sendDTMF(dtmf: String, result: Result) {
         try {
-            val coreCall = mCore.currentCall
+            val coreCall = mCore.currentCall ?: mCore.calls.firstOrNull()
             if(coreCall == null) {
                 Log.d(TAG, "Current call not found")
                 return result.success(false)
@@ -370,22 +375,26 @@ internal class SipManager private constructor(context: Context) {
     }
 
     fun toggleSpeaker(result: Result) {
-        val coreCall = mCore.currentCall ?: return result.error("404", "Current call not found", null)
-        val currentAudioDevice = coreCall.outputAudioDevice
+        val currentCall = mCore.currentCall ?: mCore.calls.firstOrNull()
+        if(currentCall == null) {
+            return result.error("404", "Current call not found", null)
+        }
+        val currentAudioDevice = currentCall.outputAudioDevice
         val speakerEnabled = currentAudioDevice?.type == AudioDevice.Type.Speaker
         for (audioDevice in mCore.audioDevices) {
             if (speakerEnabled && audioDevice.type == AudioDevice.Type.Earpiece) {
-                coreCall.outputAudioDevice = audioDevice
+                currentCall.outputAudioDevice = audioDevice
                 return result.success(false)
             } else if (!speakerEnabled && audioDevice.type == AudioDevice.Type.Speaker) {
-                coreCall.outputAudioDevice = audioDevice
+                currentCall.outputAudioDevice = audioDevice
                 return result.success(true)
             }
         }
     }
 
     fun toggleMic(result: Result) {
-        if(mCore.currentCall == null) {
+        val currentCall = mCore.currentCall ?: mCore.calls.firstOrNull()
+        if(currentCall == null) {
             return result.error("404", "Current call not found", null)
         }
         mCore.isMicEnabled = !mCore.isMicEnabled
@@ -429,7 +438,8 @@ internal class SipManager private constructor(context: Context) {
     }
 
     fun getCallId(result: Result) {
-        mCore.currentCall?.callLog?.callId?.let {
+        val currentCall = mCore.currentCall ?: mCore.calls.firstOrNull()
+        currentCall?.callLog?.callId?.let {
             result.success(it)
         } ?: kotlin.run {
             result.error("404", "Call ID not found", null)
@@ -453,7 +463,8 @@ internal class SipManager private constructor(context: Context) {
     }
 
     fun isSpeakerEnabled(result: Result) {
-        val currentAudioDevice = mCore.currentCall?.outputAudioDevice
+        val currentCall = mCore.currentCall ?: mCore.calls.firstOrNull()
+        val currentAudioDevice = currentCall?.outputAudioDevice
         val speakerEnabled = currentAudioDevice?.type == AudioDevice.Type.Speaker
         result.success(speakerEnabled)
     }
