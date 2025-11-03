@@ -1,3 +1,8 @@
+## 0.0.7
+
+* Fix chính sách 16KB, Bitcode
+* Nâng cấp core gọi thoại
+
 ## 0.0.6
 
 * Fix duplicate pushkit
