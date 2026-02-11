@@ -129,6 +129,14 @@ class Voip24hSdkMobilePlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
         sipManager.setCodecs(codecs, isEnable, result)
       }
 
+      "disableSipAccount" -> {
+          sipManager.disableSipAccount(result)
+      }
+
+      "enableSipAccount" -> {
+          sipManager.enableSipAccount(result)
+      }
+
       else -> {
         result.notImplemented()
       }

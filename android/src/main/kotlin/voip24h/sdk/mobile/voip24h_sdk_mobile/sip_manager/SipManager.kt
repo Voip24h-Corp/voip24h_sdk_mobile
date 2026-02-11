@@ -140,16 +140,28 @@ internal class SipManager private constructor(context: Context) {
             mCore.apply {
                 isKeepAliveEnabled = sipConfiguration.isKeepAlive
                 maxCalls = 1
-                start()
                 isEchoCancellationEnabled = true
                 isEchoLimiterEnabled = true
                 isAdaptiveRateControlEnabled = true
+                isPushNotificationEnabled = false
                 removeListener(coreListener)
                 addListener(coreListener)
+                setUserAgent("BussOmni", "1.0.0")
+                start()
             }
             isInitial = true
         }
+//        val account = mCore.accountList.firstOrNull {
+//            it.params?.identityAddress?.username == sipConfiguration.extension &&
+//            it.params?.identityAddress?.domain == sipConfiguration.domain
+//        }
+//        if(account != null) {
+//            val clonedParams = account.params.clone()
+//            clonedParams.expires = 3600
+//            account.params = clonedParams
+//        } else {
         initSipAccount(sipConfiguration.extension, sipConfiguration.password, sipConfiguration.domain, sipConfiguration.port, sipConfiguration.toLpTransportType())
+//        }
     }
 
     private fun initSipAccount(ext: String, password: String, domain: String, port: Int, transportType: TransportType) {
@@ -424,6 +436,24 @@ internal class SipManager private constructor(context: Context) {
         mCore.clearProxyConfig()
         deleteSipAccount()
         result.success(true)
+    }
+
+    fun disableSipAccount(result: Result) {
+        val account = mCore.defaultAccount
+        if(account != null) {
+            val clonedParams = account.params.clone()
+            clonedParams.expires = 0
+            account.params = clonedParams
+        }
+    }
+
+    fun enableSipAccount(result: Result) {
+        val account = mCore.defaultAccount
+        if(account != null) {
+            val clonedParams = account.params.clone()
+            clonedParams.expires = 3600
+            account.params = clonedParams
+        }
     }
 
     private fun deleteSipAccount() {
