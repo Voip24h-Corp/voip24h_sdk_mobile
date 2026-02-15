@@ -134,11 +134,11 @@ class CallModule {
     return await _methodChannel.invokeMethod('setCodecs', {"codecs": codec.value, "isEnable": isEnable});
   }
 
-  Future<String> disableSipAccount() async {
+  Future<bool> disableSipAccount() async {
     return await _methodChannel.invokeMethod('disableSipAccount');
   }
 
-  Future<String> enableSipAccount() async {
+  Future<bool> enableSipAccount() async {
     return await _methodChannel.invokeMethod('enableSipAccount');
   }
 

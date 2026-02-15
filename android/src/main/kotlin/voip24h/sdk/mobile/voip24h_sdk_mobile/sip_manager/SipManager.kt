@@ -444,6 +444,9 @@ internal class SipManager private constructor(context: Context) {
             val clonedParams = account.params.clone()
             clonedParams.expires = 0
             account.params = clonedParams
+            result.success(true)
+        } else {
+            result.success(false)
         }
     }
 
@@ -453,6 +456,9 @@ internal class SipManager private constructor(context: Context) {
             val clonedParams = account.params.clone()
             clonedParams.expires = 3600
             account.params = clonedParams
+            result.success(true)
+        } else {
+            result.success(false)
         }
     }
 
