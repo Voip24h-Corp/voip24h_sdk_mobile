@@ -41,7 +41,11 @@ public class SwiftVoip24hSdkMobilePlugin: NSObject, FlutterPlugin, FlutterStream
                 // NSLog("Recipient is not valid")
                 return result(FlutterError(code: "404", message: "Recipient is not valid", details: nil))
             }
-            sipManager.call(recipient: phoneNumber!, result: result)
+            DispatchQueue.global(qos: .userInitiated).async {
+//                    SipManager.instance.call(recipient: recipient, result: result)
+                self.sipManager.call(recipient: phoneNumber!, result: result)
+            }
+//            sipManager.call(recipient: phoneNumber!, result: result)
             break
         case "hangup":
             sipManager.hangup(result: result)
@@ -117,6 +121,12 @@ public class SwiftVoip24hSdkMobilePlugin: NSObject, FlutterPlugin, FlutterStream
                 return result(FlutterError(code: "500", message: "Codecs or IsEnable is not valid", details: nil))
             }
             sipManager.setCodecs(codecs: codecs!, isEnable: isEnable!, result: result)
+            break
+        case "disableSipAccount":
+            sipManager.disableSipAccount(result: result)
+            break
+        case "enableSipAccount":
+            sipManager.enableSipAccount(result: result)
             break
         default:
             result(FlutterMethodNotImplemented)

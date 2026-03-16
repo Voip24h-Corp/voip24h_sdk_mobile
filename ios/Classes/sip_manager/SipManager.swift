@@ -21,7 +21,7 @@ class SipManager {
         do {
             do {
                 let audioSession = AVAudioSession.sharedInstance()
-                try audioSession.setCategory(.playAndRecord, options: [.defaultToSpeaker, .allowBluetooth])
+                try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: [.defaultToSpeaker, .allowBluetooth])
                 try audioSession.setActive(true)
             } catch {
                 NSLog("Error while configuring audio session: \(error.localizedDescription)")
@@ -160,13 +160,15 @@ class SipManager {
             if !isInitial {
                 mCore.keepAliveEnabled = sipConfiguration.isKeepAlive
                 mCore.maxCalls = 1
-                try mCore.start()
-                mCore.echoCancellationEnabled = true
-                mCore.echoLimiterEnabled = true
+                mCore.echoCancellationEnabled = false
+                mCore.echoLimiterEnabled = false
                 mCore.adaptiveRateControlEnabled = true
+                mCore.pushNotificationEnabled = false
                 mCore.removeDelegate(delegate: coreDelegate)
                 mCore.addDelegate(delegate: coreDelegate)
+                mCore.setUserAgent(name: "BussOmni", version: "1.0.0")
                 isInitial = true
+                try mCore.start()
             }
             initSipAccount(ext: sipConfiguration.ext, password: sipConfiguration.password, domain: sipConfiguration.domain, port: sipConfiguration.port, transportType: sipConfiguration.toLpTransportType())
         } catch {
@@ -551,6 +553,30 @@ class SipManager {
     // func removeListener() {
         // mCore.removeDelegate(delegate: coreDelegate)
     // }
+    
+    func enableSipAccount(result: FlutterResult) {
+        let account = mCore.defaultAccount
+        if(account != nil) {
+            let clonedParams = account?.params?.clone()
+            clonedParams?.expires = 3600
+            account?.params = clonedParams
+            result(true)
+        } else {
+            result(false)
+        }
+    }
+    
+    func disableSipAccount(result: FlutterResult) {
+        let account = mCore.defaultAccount
+        if(account != nil) {
+            let clonedParams = account?.params?.clone()
+            clonedParams?.expires = 0
+            account?.params = clonedParams
+            result(true)
+        } else {
+            result(false)
+        }
+    }
     
     private func isMissed(callLog: CallLog?) -> Bool {
         return (callLog?.dir == Call.Dir.Incoming && callLog?.status == Call.Status.Missed)
